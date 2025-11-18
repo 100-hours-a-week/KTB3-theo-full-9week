@@ -1,0 +1,31 @@
+.toast-container {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    width: 100%;
+}
+
+.toast-wrapper {
+    background-color: #fff;
+    padding: 2% 3%;
+    border: 1px solid black;
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgb(0, 0, 0, 0.2);
+    width: 20%;
+    text-align: center;
+}
+
+#toast-btn {
+    border: transparent;
+    padding: 2% 4%;
+    width: 70%;
+    border-radius: 20px;
+
+    cursor: pointer;
+    color : black;
+    background-color: #C4A5FA;
+}

@@ -1,0 +1,18 @@
+.post-card-list-container{
+    width: 60%;
+    margin: 4% auto;
+}
+
+.post-card-list-section {
+    width: 100%;
+    display: none;
+}
+.post-card-list-section.active {
+    display: block;
+}
+.post-detail-section {
+    width: 100%;
+}
+.post-detail-section.active {
+    display: block;
+}
