@@ -5,6 +5,7 @@ export const apiPath = {
     // Image Storage
     PROFILE_IMAGE_STORATE_URL: 'http://localhost:8080/images/profile/',
     ARTICLE_IMAGE_STORAGE_URL: 'http://localhost:8080/images/article/',
+    TODAY_FISH_LOGO_URL: 'http://localhost:8080/images/logo/',
 
     // Auth
     LOGIN_API_URL: '/auth/access/token',
