@@ -89,6 +89,7 @@ export function postCardList() {
 
     // 무한 스크롤 시 페이지 로딩 함수
     async function loadNextPage() {
+        const now = Date.now();
         try {
 
             // 로딩 중이거나 다음 페이지 없으면 페이지 로드 X
@@ -104,9 +105,11 @@ export function postCardList() {
 
             // Post 렌더링
             const contents = responseBody.contents;
+            const fragment = document.createDocumentFragment();
             contents.forEach((post) => {
-                listSection.insertBefore(postCard(post), sentinel);
+                fragment.append(postCard(post));
             })
+            listSection.insertBefore(fragment, sentinel);
 
             // 다음 로드 페이지 계산
             currentPage = responseBody.currentPage + 1;
@@ -117,6 +120,8 @@ export function postCardList() {
                 // TODO : API 에러 처리
             }
         } finally {
+            const diff = Date.now() - now;
+            console.log(diff);
             isLoading = false;
         }
     }

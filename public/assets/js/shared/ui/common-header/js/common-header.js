@@ -36,7 +36,7 @@ export function commonHeader() {
     const backButton = root.querySelector('#common-back-btn');
     const profileButton = root.querySelector('#common-header-profile-btn');
     const profileImage = root.querySelector('#common-header-userprofile');
-    updateProfileImage(); // 첫 렌더링간 유저 프로필 이미지 업데이트
+    // updateProfileImage(); // 첫 렌더링간 유저 프로필 이미지 업데이트
 
     // 돌아가기 버튼 이벤트 등록
     backButton.addEventListener('click', () => {
@@ -82,6 +82,7 @@ export function commonHeader() {
     // 헤더 프로필 로컬 스토리지 기반 이미지 업데이트
     function updateProfileImage() {
         profileImage.src = apiPath.PROFILE_IMAGE_STORATE_URL + localStorage.getItem('profileImage');
+        profileImage.toggleAttribute('hidden', !localStorage.getItem('profileImage'));
     }
 
     // 로그아웃 시 드롭다운 메뉴 숨기기

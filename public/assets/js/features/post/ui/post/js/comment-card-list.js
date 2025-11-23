@@ -183,6 +183,7 @@ export function commentCardList(postId) {
 
     // 5. 무한 스크롤 페이지 로딩 함수
     async function loadNextPage() {
+        const now = Date.now();
         try {
             if (isLoading || !hasNext) {
                 return;
@@ -196,9 +197,11 @@ export function commentCardList(postId) {
 
             // 댓글 컴포넌트 렌더링, 삽입
             const contents = responseBody.contents;
+            const fragment = document.createDocumentFragment();
             contents.forEach((item) => {
-                root.insertBefore(comment(item, postId), sentinel);
+                fragment.append(comment(item.postId));
             });
+            root.insertBefore(fragment, sentinel);
 
             // 다음 로드 페이지 미리 계산
             currentPage = responseBody.currentPage + 1;
@@ -209,6 +212,8 @@ export function commentCardList(postId) {
 
             }
         } finally {
+            const diff = now - Date.now();
+            console.log(diff);
             isLoading = false;
         }
     }

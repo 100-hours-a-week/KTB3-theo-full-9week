@@ -41,12 +41,7 @@ export function login() {
     const helperText = root.querySelector('#login-form-helper-text');
     const signUpLink = root.querySelector('#login-to-signup-link');
 
-    // 이벤트 리스너 등록
-    // 1. 로그인 폼 태그 이벤트 등록
-    form.addEventListener('submit', (event) => {
-        event.preventDefault();
-        handleLoginRequest();
-    })
+
 
     // 로그인 요청
     async function handleLoginRequest() {
@@ -86,32 +81,32 @@ export function login() {
         }
     }
 
-    // 2. 이메일 이벤트 등록
-    emailInput.addEventListener('input', () => {
-        handleInvalidEmail();
-        activeLoginButton();
-    });
-
-    // 3. 패스워드 이벤트 등록
-    passwordInput.addEventListener('input', () => {
-        handleInvalidPassword();
-        activeLoginButton();
-    });
-
-    // 4. 회원가입 페이지 이동 이벤트 등록
-    signUpLink.addEventListener('click', (event) => {
-        event.preventDefault();
-        navigate('/signup');
-    })
-
-
-    // 이벤트 리스너 콜백 함수
-    // 1. 로그인 실패 핸들러
+    // 로그인 실패 핸들러
     function handleLoginFail(error) {
         helperText.textContent = error.message;
     }
 
-    // 2. 로그인 버튼 활성화 검사 핸들러
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        handleLoginRequest();
+    })
+
+
+    // 이메일 유효성 검증 핸들러
+    function handleInvalidEmail() {
+        const email = String(emailInput.value).trim();
+        if (isBlank(email)) {
+            helperText.textContent = '이메일을 입력해주세요';
+            return;
+        }
+        if (!isEmail(email)) {
+            helperText.textContent = '올바른 이메일 주소 형식을 입력해주세요. example@example.com';
+            return;
+        }
+        helperText.textContent = '';
+    }
+
+    // 로그인 버튼 활성화 검사 핸들러
     function activeLoginButton() {
         const email = String(emailInput.value).trim();
         const password = String(passwordInput.value).trim();
@@ -128,22 +123,13 @@ export function login() {
         loginButton.classList.toggle('active', canActive);
         loginButton.disabled = !canActive;
     }
+    // 이메일 이벤트 등록
+    emailInput.addEventListener('input', () => {
+        handleInvalidEmail();
+        activeLoginButton();
+    });
 
-    // 3. 이메일 유효성 검증 핸들러
-    function handleInvalidEmail() {
-        const email = String(emailInput.value).trim();
-        if (isBlank(email)) {
-            helperText.textContent = '이메일을 입력해주세요';
-            return;
-        }
-        if (!isEmail(email)) {
-            helperText.textContent = '올바른 이메일 주소 형식을 입력해주세요. example@example.com';
-            return;
-        }
-        helperText.textContent = '';
-    }
-
-    // 4. 패스워드 유효성 검증 핸들러
+    // 패스워드 유효성 검증 핸들러
     function handleInvalidPassword() {
         const password = String(passwordInput.value).trim();
         if (isBlank(password)) {
@@ -157,6 +143,28 @@ export function login() {
 
         helperText.textContent = '';
     }
+
+    // 패스워드 이벤트 등록
+    passwordInput.addEventListener('input', () => {
+        handleInvalidPassword();
+        activeLoginButton();
+    });
+
+
+    // 4. 회원가입 페이지 이동 이벤트 등록
+    signUpLink.addEventListener('click', (event) => {
+        event.preventDefault();
+        navigate('/signup');
+    })
+
+
+
+
+
+
+
+
+
 
 
 

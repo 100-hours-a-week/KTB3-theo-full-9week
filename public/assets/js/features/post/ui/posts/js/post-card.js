@@ -45,13 +45,16 @@ export function postCard(post) {
         emit('post:postCardClick', { postId });
     })
 
-    // 게시글 조회 수, 좋아요 수, 댓글 수 변동 시 PostCard 동기화
-    eventBus.addEventListener(`post:updatePostCard/${id}`, (event, options) => {
+    const type = `post:updatePostCard/${id}`;
+    function updatePostCardHandler(event) {
         const { nowCommentCount, nowViewCount, nowLikeCount } = event.detail;
         postCardLikeCount.textContent = `좋아요 ${nowLikeCount}`;
-        postCardCommentCount.textContent = `댓글 ${nowCommentCount}`;
-        postCardViewCount.textContent = `조회 수 ${nowViewCount}`;
-    })
+        postCardCommentCount.textContent = `댓글 ${nowCommentCount} `;
+        postCardViewCount.textContent = `조회 수 ${nowViewCount} `;
+
+        eventBus.removeEventListener(type, updatePostCardHandler);
+    }
+    eventBus.addEventListener(type, updatePostCardHandler);
 
     return root;
 }

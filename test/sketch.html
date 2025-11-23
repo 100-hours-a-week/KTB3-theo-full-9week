@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title>오늘의 물고기 - 시세 메인</title>
+    <style>
+        :root {
+            /* 지금 서비스랑 어울리는 느낌의 블루 톤 */
+            --bg-page: #e3f2fd;
+            --bg-card: #ffffff;
+            --border-card: #cfd8dc;
+            --primary: #1976d2;
+            --primary-soft: #bbdefb;
+            --text-main: #1f2933;
+            --text-sub: #607d8b;
+            --accent-up: #2e7d32;
+            --accent-down: #d32f2f;
+            --radius-card: 12px;
+            --shadow-card: 0 4px 10px rgba(15, 23, 42, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+
+        .app {
+            max-width: 1040px;
+            margin: 24px auto 32px;
+            padding: 0 16px;
+        }
+
+        /* 상단 간단 헤더 (기존 서비스랑 어울리게 심플하게) */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .top-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-mark {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #1976d2, #42a5f5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 700;
+            box-shadow: 0 4px 8px rgba(25, 118, 210, 0.35);
+        }
+
+        .service-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .top-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: var(--text-sub);
+        }
+
+        .top-link {
+            padding: 4px 10px;
+            border-radius: 999px;
+            cursor: pointer;
+        }
+
+        .top-link--active {
+            background-color: rgba(25, 118, 210, 0.08);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .user-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.5);
+        }
+
+        .user-avatar {
+            width: 22px;
+            height: 22px;
+            border-radius: 999px;
+            background: #1976d2;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 메인 레이아웃: 좌측 시세 / 우측 라이브 패널 */
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 2.1fr) minmax(280px, 0.9fr);
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        @media (max-width: 900px) {
+            .layout {
+                grid-template-columns: minmax(0, 1fr);
+            }
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border-radius: var(--radius-card);
+            border: 1px solid var(--border-card);
+            box-shadow: var(--shadow-card);
+            padding: 14px 16px 16px;
+        }
+
+        /* 좌측 카드: 시세 영역 */
+        .price-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .price-title-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .price-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .price-subtitle {
+            font-size: 12px;
+            color: var(--text-sub);
+        }
+
+        .label-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            color: var(--text-sub);
+        }
+
+        .label-tag {
+            border-radius: 10px;
+            padding: 3px 8px;
+            background-color: var(--primary-soft);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* 어종 탭 (기존 서비스 탭/버튼 느낌으로 심플하게) */
+        .fish-tabs {
+            display: flex;
+            gap: 6px;
+            margin: 10px 0 12px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+
+        .fish-tab {
+            padding: 6px 12px;
+            font-size: 13px;
+            border-radius: 999px;
+            border: 1px solid #cfd8dc;
+            background-color: #f5f5f5;
+            color: var(--text-sub);
+            white-space: nowrap;
+            cursor: default;
+            /* 기능 없음 */
+        }
+
+        .fish-tab--active {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        /* 시세 요약 (기존 post-card 느낌의 간단한 카드 3개) */
+        .summary-row {
+            display: grid;
+            grid-template-columns: 1.7fr 1.2fr 1.2fr;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        @media (max-width: 700px) {
+            .summary-row {
+                grid-template-columns: 1.7fr 1.3fr;
+            }
+        }
+
+        .summary-box {
+            border-radius: 10px;
+            border: 1px solid #cfd8dc;
+            background-color: #f8fafc;
+            padding: 8px 10px;
+            font-size: 12px;
+        }
+
+        .summary-box--main {
+            background: linear-gradient(135deg, #1976d2, #42a5f5);
+            color: #e3f2fd;
+            border: none;
+        }
+
+        .summary-label {
+            font-size: 11px;
+            color: var(--text-sub);
+            margin-bottom: 4px;
+        }
+
+        .summary-box--main .summary-label {
+            color: #e3f2fd;
+            opacity: 0.9;
+        }
+
+        .summary-value {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .summary-unit {
+            font-size: 11px;
+        }
+
+        .summary-change {
+            font-size: 11px;
+            margin-top: 3px;
+        }
+
+        .summary-change--up {
+            color: var(--accent-up);
+        }
+
+        .summary-change--down {
+            color: var(--accent-down);
+        }
+
+        .summary-meta {
+            font-size: 10px;
+            color: var(--text-sub);
+            margin-top: 4px;
+        }
+
+        .summary-box--main .summary-meta {
+            color: #bbdefb;
+        }
+
+        /* 차트 영역 - 주식(캔들) 느낌 UI */
+        .chart-section {
+            border-radius: 10px;
+            border: 1px solid #cfd8dc;
+            background-color: #f9fbff;
+            padding: 10px 10px 12px;
+        }
+
+        .chart-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 11px;
+            color: var(--text-sub);
+        }
+
+        .chart-range {
+            display: inline-flex;
+            gap: 4px;
+            padding: 2px;
+            border-radius: 999px;
+            background-color: #e3f2fd;
+        }
+
+        .chart-range button {
+            border: none;
+            background: transparent;
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 999px;
+            cursor: default;
+            color: var(--text-sub);
+        }
+
+        .chart-range button.active {
+            background-color: #ffffff;
+            color: var(--primary);
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.16);
+        }
+
+        .chart-area {
+            position: relative;
+            height: 220px;
+            margin: 4px 0 8px;
+            background: linear-gradient(to top,
+                    rgba(187, 222, 251, 0.2),
+                    rgba(227, 242, 253, 0.7));
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        /* 그리드 */
+        .chart-area::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(to right, rgba(144, 164, 174, 0.2) 1px, transparent 1px),
+                linear-gradient(to top, rgba(144, 164, 174, 0.2) 1px, transparent 1px);
+            background-size: 34px 100%, 100% 34px;
+            opacity: 0.5;
+        }
+
+        /* 캔들 전체 컨테이너 */
+        .candles {
+            position: absolute;
+            inset: 12px 10px 16px 10px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+        }
+
+        .candle {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 16px;
+            /* 캔들 너비 */
+        }
+
+        .wick {
+            width: 2px;
+            flex-grow: 1;
+            background-color: rgba(55, 71, 79, 0.6);
+        }
+
+        .body {
+            width: 12px;
+            height: 26px;
+            border-radius: 3px;
+            margin-top: 4px;
+        }
+
+        .body--up {
+            background-color: #2e7d32;
+        }
+
+        .body--down {
+            background-color: #d32f2f;
+        }
+
+        /* 샘플 높이 조정용 */
+        .candle:nth-child(1) .wick {
+            height: 70px;
+        }
+
+        .candle:nth-child(1) .body {
+            height: 24px;
+        }
+
+        .candle:nth-child(2) .wick {
+            height: 92px;
+        }
+
+        .candle:nth-child(2) .body {
+            height: 36px;
+        }
+
+        .candle:nth-child(3) .wick {
+            height: 76px;
+        }
+
+        .candle:nth-child(3) .body {
+            height: 28px;
+        }
+
+        .candle:nth-child(4) .wick {
+            height: 110px;
+        }
+
+        .candle:nth-child(4) .body {
+            height: 42px;
+        }
+
+        .candle:nth-child(5) .wick {
+            height: 96px;
+        }
+
+        .candle:nth-child(5) .body {
+            height: 30px;
+        }
+
+        .candle:nth-child(6) .wick {
+            height: 104px;
+        }
+
+        .candle:nth-child(6) .body {
+            height: 38px;
+        }
+
+        .candle:nth-child(7) .wick {
+            height: 88px;
+        }
+
+        .candle:nth-child(7) .body {
+            height: 32px;
+        }
+
+        .chart-bottom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 10px;
+            color: var(--text-sub);
+        }
+
+        /* 우측 LIVE & 채팅 패널 */
+        .live-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .live-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+            background-color: #2e7d32;
+            box-shadow: 0 0 0 4px rgba(46, 125, 50, 0.25);
+        }
+
+        .live-badge {
+            font-size: 10px;
+            padding: 3px 7px;
+            border-radius: 999px;
+            border: 1px solid rgba(211, 47, 47, 0.5);
+            color: #d32f2f;
+            background-color: rgba(244, 67, 54, 0.08);
+        }
+
+        .live-viewer-line {
+            font-size: 12px;
+            color: var(--text-sub);
+            margin-bottom: 8px;
+        }
+
+        .live-viewer-line strong {
+            color: var(--primary);
+        }
+
+        .viewer-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .viewer-chip {
+            width: 22px;
+            height: 22px;
+            border-radius: 999px;
+            background-color: #e3f2fd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: var(--primary);
+            border: 1px solid #cfd8dc;
+        }
+
+        .viewer-more {
+            font-size: 11px;
+            color: var(--text-sub);
+        }
+
+        .divider {
+            height: 1px;
+            background: linear-gradient(to right, transparent, #cfd8dc, transparent);
+            margin: 8px 0 10px;
+        }
+
+        .chat-info {
+            font-size: 11px;
+            color: var(--text-sub);
+            margin-bottom: 8px;
+        }
+
+        .chat-area {
+            display: flex;
+            flex-direction: column;
+            height: 280px;
+        }
+
+        .chat-list {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 2px;
+            margin-bottom: 8px;
+        }
+
+        .chat-item {
+            margin-bottom: 6px;
+            font-size: 12px;
+        }
+
+        .chat-meta {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            margin-bottom: 2px;
+        }
+
+        .chat-name {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .chat-time {
+            color: var(--text-sub);
+            font-size: 10px;
+        }
+
+        .chat-bubble {
+            padding: 6px 8px;
+            border-radius: 8px;
+            background-color: #f1f5f9;
+            color: var(--text-main);
+            max-width: 100%;
+            word-break: break-all;
+        }
+
+        .chat-item--mine .chat-bubble {
+            background-color: #bbdefb;
+        }
+
+        .chat-input-row {
+            margin-top: auto;
+            border-radius: 999px;
+            border: 1px solid #cfd8dc;
+            background-color: #f9fafb;
+            padding: 4px 6px 4px 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chat-input {
+            border: none;
+            background: transparent;
+            font-size: 12px;
+            flex: 1;
+            outline: none;
+        }
+
+        .chat-send-btn {
+            border: none;
+            border-radius: 999px;
+            padding: 5px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            background-color: var(--primary);
+            color: #ffffff;
+            cursor: default;
+            /* (UI만) */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+        <!-- 상단: 심플 헤더 -->
+        <div class="top-bar">
+            <div class="top-left">
+                <div class="logo-mark">魚</div>
+                <div class="service-name">오늘의 물고기</div>
+            </div>
+            <div class="top-right">
+                <div class="top-link top-link--active">시세</div>
+                <div class="top-link">게시판</div>
+                <div class="top-link">마이페이지</div>
+                <div class="user-pill">
+                    <div class="user-avatar">Y</div>
+                    <span>youngmin</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 메인 레이아웃 -->
+        <div class="layout">
+            <!-- 좌측: 시세 카드 -->
+            <section class="card">
+                <div class="price-header">
+                    <div class="price-title-wrap">
+                        <h1 class="price-title">오늘의 수산 시세</h1>
+                        <p class="price-subtitle">노량진 기준 · 2025-11-20</p>
+                    </div>
+                    <div class="label-row">
+                        <span class="label-tag">도매 · 위판 기준</span>
+                        <span>단위: kg 당 원</span>
+                    </div>
+                </div>
+
+                <!-- 어종 탭 -->
+                <div class="fish-tabs">
+                    <button class="fish-tab fish-tab--active">광어</button>
+                    <button class="fish-tab">연어</button>
+                    <button class="fish-tab">참돔</button>
+                    <button class="fish-tab">방어</button>
+                    <button class="fish-tab">우럭</button>
+                    <button class="fish-tab">기타 어종</button>
+                </div>
+
+                <!-- 요약 박스 -->
+                <div class="summary-row">
+                    <div class="summary-box summary-box--main">
+                        <div class="summary-label">현재 평균 경매가 (광어)</div>
+                        <div class="summary-value">
+                            23,800 <span class="summary-unit">원 / kg</span>
+                        </div>
+                        <div class="summary-change summary-change--up">
+                            ▲ 1,200원 · +5.3%
+                        </div>
+                        <div class="summary-meta">
+                            전일 대비 · 최근 경매 기준
+                        </div>
+                    </div>
+
+                    <div class="summary-box">
+                        <div class="summary-label">고가 / 저가</div>
+                        <div class="summary-value" style="font-size:15px;">
+                            26,500 / 21,000
+                        </div>
+                        <div class="summary-meta">
+                            오늘 경매 내 최고 / 최저
+                        </div>
+                    </div>
+
+                    <div class="summary-box">
+                        <div class="summary-label">거래 물량</div>
+                        <div class="summary-value">
+                            4.3t
+                        </div>
+                        <div class="summary-meta">
+                            금일 누적 물량 기준
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 차트 영역 (주식 캔들 느낌 UI만) -->
+                <div class="chart-section">
+                    <div class="chart-top">
+                        <span>최근 7일 시세 (예시 UI)</span>
+                        <div class="chart-range">
+                            <button>1D</button>
+                            <button class="active">1W</button>
+                            <button>1M</button>
+                        </div>
+                    </div>
+
+                    <div class="chart-area">
+                        <div class="candles">
+                            <div class="candle">
+                                <div class="wick"></div>
+                                <div class="body body--down"></div>
+                            </div>
+                            <div class="candle">
+                                <div class="wick"></div>
+                                <div class="body body--up"></div>
+                            </div>
+                            <div class="candle">
+                                <div class="wick"></div>
+                                <div class="body body--up"></div>
+                            </div>
+                            <div class="candle">
+                                <div class="wick"></div>
+                                <div class="body body--down"></div>
+                            </div>
+                            <div class="candle">
+                                <div class="wick"></div>
+                                <div class="body body--up"></div>
+                            </div>
+                            <div class="candle">
+                                <div class="wick"></div>
+                                <div class="body body--up"></div>
+                            </div>
+                            <div class="candle">
+                                <div class="wick"></div>
+                                <div class="body body--down"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chart-bottom">
+                        <span>※ 샘플 UI입니다. 실제 데이터 연동 시 교체</span>
+                        <span>7일 평균 22,400원 / kg</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 우측: 라이브 & 채팅 카드 -->
+            <aside class="card">
+                <div class="live-header">
+                    <div class="live-title">
+                        <span class="live-dot"></span>
+                        <span>광어 시세 라이브</span>
+                    </div>
+                    <span class="live-badge">LIVE</span>
+                </div>
+
+                <p class="live-viewer-line">
+                    지금 이 차트를 보고 있는 사람: <strong>7명</strong>
+                </p>
+
+                <div class="viewer-row">
+                    <div class="viewer-chip">HJ</div>
+                    <div class="viewer-chip">KM</div>
+                    <div class="viewer-chip">L</div>
+                    <div class="viewer-chip">SY</div>
+                    <span class="viewer-more">+3</span>
+                </div>
+
+                <div class="divider"></div>
+
+                <p class="chat-info">
+                    오늘 시세 이야기, 매입/판매 고민, 정보 공유를 자유롭게 나누는 공간입니다. (현재는 UI만 표시됩니다)
+                </p>
+
+                <div class="chat-area">
+                    <div class="chat-list">
+                        <div class="chat-item">
+                            <div class="chat-meta">
+                                <span class="chat-name">fishlover</span>
+                                <span class="chat-time">09:12</span>
+                            </div>
+                            <div class="chat-bubble">
+                                오늘 광어 가격 진짜 많이 올라왔네요… 내일은 좀 진정되려나 😅
+                            </div>
+                        </div>
+
+                        <div class="chat-item">
+                            <div class="chat-meta">
+                                <span class="chat-name">marketWatcher</span>
+                                <span class="chat-time">09:15</span>
+                            </div>
+                            <div class="chat-bubble">
+                                오전 물량이 적어서 그런 듯요. 오후 경매 한 번 더 봐야 할 것 같아요.
+                            </div>
+                        </div>
+
+                        <div class="chat-item chat-item--mine">
+                            <div class="chat-meta">
+                                <span class="chat-name">youngmin</span>
+                                <span class="chat-time">09:18</span>
+                            </div>
+                            <div class="chat-bubble">
+                                방어랑 연어도 이렇게 캔들로 같이 비교하면 재밌겠다.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chat-input-row">
+                        <input class="chat-input" type="text" placeholder="메시지를 입력해 보세요 (UI만 동작)" disabled>
+                        <button class="chat-send-btn" type="button">전송</button>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+</body>
+
+</html>
