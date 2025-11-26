@@ -112,6 +112,7 @@ export class Api {
         const options = this.buildOptions();
 
         const fetchResponse = await fetch(url, options);
+        this.#updateAccessTokenStore(fetchResponse.headers);
 
         const canHaveJsonBody = this.#canHaveJsonBody(fetchResponse);
 
@@ -151,8 +152,8 @@ export class Api {
         }
     }
 
-    #updateAccessTokenStore(fetchResponse) {
-        const authorizationHeader = fetchResponse.headers.get('Authorization');
+    #updateAccessTokenStore(headers) {
+        const authorizationHeader = headers.get('Authorization');
         if (!authorizationHeader) {
             return;
         }
