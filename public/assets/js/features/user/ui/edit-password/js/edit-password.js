@@ -5,6 +5,7 @@ import { ApiError } from "../../../../../shared/lib/api/api-error.js";
 import { navigate } from "../../../../../shared/lib/router.js";
 import { toast } from "../../../../../shared/ui/toast/js/toast.js";
 import { requestEditPassword } from "../../../../../shared/lib/api/user-api.js";
+import { emit } from "../../../../../shared/lib/eventBus.js";
 
 activeFeatureCss(cssPath.EDIT_PASSWORD_CSS_PATH);
 
@@ -149,7 +150,8 @@ export function editPassword() {
                 title: "수정 완료",
                 buttonTitle: "로그인 화면 이동",
                 buttonLogic: function () {
-                    navigate('/login');
+                    emit('user:logout', {})
+                    navigate('/logout');
                 }
             }
             const toastComponent = toast(toastLogic);

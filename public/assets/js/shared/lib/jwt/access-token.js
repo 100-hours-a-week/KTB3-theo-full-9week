@@ -6,7 +6,6 @@ class AccessTokenStore {
     }
 
     setAccessToken(accessToken) {
-        console.log(accessToken);
         this.#accessToken = accessToken;
     }
 

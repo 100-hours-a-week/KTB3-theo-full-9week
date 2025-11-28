@@ -66,7 +66,7 @@ export async function editProfile() {
         try {
             const userId = currentUser.id;
             const oldFileName = localStorage.getItem('profileImage');
-            const profileImage = profileImageInput.files[0];
+            const profileImage = profileImageInput.files[0] ? profileImageInput.files[0] : new Blob();
             const nickname = String(nicknameInput.value).trim();
 
             const response = await requestProfileEdit(userId, oldFileName, profileImage, nickname);
@@ -74,6 +74,7 @@ export async function editProfile() {
 
             const newProfileImage = responseBody.profileImage;
             localStorage.setItem('profileImage', newProfileImage);
+            localStorage.setItem('nickname', nickname);
             emit('user:editProfile', { newProfileImage });
             // 토스트 메시지 띄우기
             const toastLogic = {

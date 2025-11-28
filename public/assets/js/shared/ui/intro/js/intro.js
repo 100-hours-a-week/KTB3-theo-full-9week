@@ -37,7 +37,7 @@ export function showIntroAnimation(onFinish) {
 
     const text = document.createElement('div');
     text.className = 'intro-text';
-    text.textContent = '오늘의 물고기';
+    text.textContent = '오늘의 수산';
 
     group.appendChild(logo);
     group.appendChild(text);

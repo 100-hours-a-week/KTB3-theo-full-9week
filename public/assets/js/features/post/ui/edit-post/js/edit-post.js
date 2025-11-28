@@ -67,7 +67,7 @@ export function editPost(post) {
         try {
             const title = String(titleInput.value).trim();
             const article = String(articleInput.value).trim();
-            const newFile = fileInput.files[0];
+            const newFile = fileInput.files[0] ? fileInput.files[0] : new Blob();
             const oldFileName = oldImageInput.value;
 
             const response = await requestEditPost(id, title, article, oldFileName, newFile, category);

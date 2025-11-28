@@ -129,6 +129,7 @@ export async function requestEditPost(postId, title, article, oldFileName, artic
             category
         })
         .toFormData()
+        .print()
         .request();
 
     return response;

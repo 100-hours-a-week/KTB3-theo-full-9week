@@ -96,7 +96,7 @@ export function signup() {
                 title: "회원가입이 완료되었습니다.",
                 buttonTitle: "로그인 화면으로 이동",
                 buttonLogic: function () {
-                    navigate('/logout');
+                    navigate('/');
                 }
             }
             const toastComponent = toast(toastLogic);
